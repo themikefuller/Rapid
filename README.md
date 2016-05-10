@@ -1,2 +1,2 @@
-# rapid
+# Rapid
 Rapid is a PHP web framework.
