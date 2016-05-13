@@ -48,7 +48,7 @@ $routes = [
 
 ];
 
-// Require Web Framework
+// Require Rapid Web Framework
 require_once '../src/rapid.php';
 
 // Create a new instance of the Rapid framework
