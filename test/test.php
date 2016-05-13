@@ -43,6 +43,8 @@ require_once '../src/rapid.php';
 
 // Create a new instance of the Rapid framework
 $app = new Rapid($host,$baseurl,$routes);
+
+// Add middleware to properties of the $app object
 $app->settings = ['custom'=>'This is a custom settings','app_title'=>'My App'];
 
 // Route the request and generate a response
