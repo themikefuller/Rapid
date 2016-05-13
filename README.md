@@ -46,12 +46,13 @@ Run the app
 
     $app->Run();
 
-
 ## THE $app OBJECT
 
 ## THE REQUEST
 
 ## ROUTING
+
+## WILDCARD ROUTES
 
 ## THE RESPONSE
 
