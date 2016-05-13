@@ -18,6 +18,16 @@ $routes = [
     echo $json;
   }),
 
+  // PUT Request on / that outputs the request body
+  array('PUT','/',function($app){
+    http_response_code('201');
+    $title = 'Home Page';
+    $message = $app->request['body'];
+    $json = json_encode([$title,$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    echo $json;
+  }),
+
+
   // POST Request on /
   array('POST','/:pages',function($app){
     http_response_code('201');

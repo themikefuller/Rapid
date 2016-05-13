@@ -130,6 +130,10 @@ class Rapid {
             $body = json_decode($input,true);
         }
 
+        if (strpos($input,'{') !== 0 and $body == []) {
+            parse_str($input,$body);
+        }
+
         if (isset($_SERVER['REQUEST_METHOD'])) {
             $method = $_SERVER['REQUEST_METHOD'];
         }
