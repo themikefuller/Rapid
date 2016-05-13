@@ -21,7 +21,7 @@ $routes = [
   // GET Request on /users
   array('GET','/users',function($app){
     http_response_code('200');
-    $title = 'About Page';
+    $title = 'User List';
     $message = 'This would be a list of users.';
     $json = json_encode([$title,$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     echo $json;
@@ -30,7 +30,7 @@ $routes = [
     // GET Request on /users/:username
   array('GET','/users/:username',function($app){
     http_response_code('200');
-    $title = 'About Page';
+    $title = 'Profile Page';
     $message = 'This would be a profile for ' . $app->request['params']['username'];
     $json = json_encode([$title,$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     echo $json;
