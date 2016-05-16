@@ -58,4 +58,4 @@ Run the app
 
 ## COMMAND LINE INTERFACE
 
-## CORS AND XSS
+## USING CORS

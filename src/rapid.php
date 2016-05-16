@@ -221,7 +221,7 @@ class Rapid {
         return $response;
     }
 
-    public function AllowXSS($allowed) {
+    public function AllowCORS($allowed) {
         $methods = 'GET, PUT, POST, DELETE, PATCH';
         if (!is_array($allowed)) {
             $temp = $allowed;
