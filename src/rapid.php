@@ -222,19 +222,21 @@ class Rapid {
     }
 
     public function AllowXSS($allowed) {
+        $methods = 'GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS';
         if (!is_array($allowed)) {
             $temp = $allowed;
             unset($allowed);
             $allowed[] = $temp;
         }
-        if (isset($_SERVER['HTTP_ORIGIN'])) {
+        if (isset($_SERVER['HTTP_ORIGIN']) AND !empty($allowed)) {
             $origin = $_SERVER['HTTP_ORIGIN'];
             if (in_array($origin,$allowed)) {
+                header("Access-Control-Allow-Headers:origin, authorization, content-type, accept");
                 header("Access-Control-Allow-Origin: $origin");
+                header("Access-Control-Allow-Methods: $methods");
             }
         }
     }
-
 
     public function Run() {
         $app = $this;
