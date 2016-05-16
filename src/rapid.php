@@ -227,9 +227,11 @@ class Rapid {
             unset($allowed);
             $allowed[] = $temp;
         }
-        $origin = $_SERVER['HTTP_ORIGIN'];
-        if (in_array($origin,$allowed)) {
-            header("Access-Control-Allow-Origin: $origin");
+        if (isset($_SERVER['HTTP_ORIGIN'])) {
+            $origin = $_SERVER['HTTP_ORIGIN'];
+            if (in_array($origin,$allowed)) {
+                header("Access-Control-Allow-Origin: $origin");
+            }
         }
     }
 
