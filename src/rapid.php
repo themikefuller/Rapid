@@ -221,6 +221,19 @@ class Rapid {
         return $response;
     }
 
+    public function AllowXSS($allowed) {
+        if (!is_array($allowed)) {
+            $temp = $allowed;
+            unset($allowed);
+            $allowed[] = $temp;
+        }
+        $origin = $_SERVER['HTTP_ORIGIN'];
+        if (in_array($origin,$allowed)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
+    }
+
+
     public function Run() {
         $app = $this;
         $response = null;
