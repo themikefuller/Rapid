@@ -18,21 +18,20 @@ $routes = [
     echo $json;
   }),
 
-  // PUT Request on / that outputs the request body
-  array('PUT','/',function($app){
-    http_response_code('201');
-    $title = 'Home Page';
-    $message = $app->request['body'];
+  // GET Request on /users
+  array('GET','/users',function($app){
+    http_response_code('200');
+    $title = 'User List';
+    $message = 'This would be a list of users.';
     $json = json_encode([$title,$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     echo $json;
   }),
-
-
-  // POST Request on /
-  array('POST','/:pages',function($app){
-    http_response_code('201');
-    $title = 'Home Page';
-    $message = $app->settings['app_title'] . ': Response to a POST on /' . $app->request['params']['pages'];
+  
+    // GET Request on /users/:username
+  array('GET','/users/:username',function($app){
+    http_response_code('200');
+    $title = 'Profile Page';
+    $message = 'This would be a profile for ' . $app->request['params']['username'];
     $json = json_encode([$title,$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     echo $json;
   }),
