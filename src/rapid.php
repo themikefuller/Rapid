@@ -165,7 +165,7 @@ class Rapid {
             $new['method']   = strtoupper($route[0]);
             $new['resource'] = $route[1];
             $new['action']   = $route[2];
-            if ($new['resource'] == '*') {
+            if ($new['resource'] == '*' and $new['method'] == '*') {
                 $this->routes[] = $new;
             } else {
                 array_unshift($this->routes,$new);
@@ -222,20 +222,19 @@ class Rapid {
     }
 
     public function AllowXSS($allowed) {
-        $methods = 'GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS';
+        $methods = 'GET, PUT, POST, DELETE, PATCH';
         if (!is_array($allowed)) {
             $temp = $allowed;
             unset($allowed);
             $allowed[] = $temp;
         }
-        if (isset($_SERVER['HTTP_ORIGIN']) AND !empty($allowed)) {
+        header("Allow: $methods");
+        header("Access-Control-Allow-Headers:Origin, Authorization, Content-Type, Accept");
+        if (isset($_SERVER['HTTP_ORIGIN']) and in_array($_SERVER['HTTP_ORIGIN'],$allowed)) {
             $origin = $_SERVER['HTTP_ORIGIN'];
-            if (in_array($origin,$allowed)) {
-                header("Access-Control-Allow-Headers:origin, authorization, content-type, accept");
-                header("Access-Control-Allow-Origin: $origin");
-                header("Access-Control-Allow-Methods: $methods");
-            }
+            header("Access-Control-Allow-Origin: $origin");
         }
+        header("Access-Control-Allow-Methods: $methods");
     }
 
     public function Run() {
