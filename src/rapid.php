@@ -15,7 +15,7 @@ class Rapid {
         // Blank, Null, Empty and defacto request values
         $protocol = 'http';
         $cookies = [];
-        $headers = null;
+        $headers = [];
         $body = [];
         $query = [];
         $method = 'GET';    
@@ -152,7 +152,7 @@ class Rapid {
           'body'=>$body,
           'cookies'=>$cookies,
           'files'=>$files,
-          'headers'=>$headers,
+          'headers'=>array_change_key_case($headers,CASE_LOWER),
         ];
         return $request;
     }
