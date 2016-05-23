@@ -53,6 +53,7 @@ class Rapid {
             }
             if (isset($argv[4])) {
                 parse_str($argv[4],$headers);
+                $headers = array_change_key_case($headers,CASE_LOWER);
             }
         }
 
@@ -112,8 +113,8 @@ class Rapid {
             $cookies = $_COOKIE;
         }
 
-        if (empty($cookies) and isset($headers['Cookies'])) {
-            parse_str($headers['Cookies'],$cookies);
+        if (empty($cookies) and isset($headers['cookies'])) {
+            parse_str($headers['cookies'],$cookies);
         }
 
         if (isset($_GET) and !empty($_GET)) {
@@ -151,10 +152,11 @@ class Rapid {
           'method'=>$method,
           'resource'=>$resource,
           'uri'=>$uri,
+          'requesturi'=>$requesturi,
           'querystring'=>$querystring,
           'query'=>$query,
           'body'=>$body,
-          'cookies'=>$cookies,
+          'cookies'=>array_change_key_case($cookies,CASE_LOWER),
           'files'=>$files,
           'headers'=>array_change_key_case($headers,CASE_LOWER),
         ];
