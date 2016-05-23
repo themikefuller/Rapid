@@ -12,9 +12,8 @@ $routes = [
   // GET Request on /
   array('GET','/',function($app){
     http_response_code('200');
-    $title = 'Home Page';
-    $message = 'This is a homepage';
-    $json = json_encode([$title,$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $message = $app->request;
+    $json = json_encode([$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     echo $json;
   }),
 

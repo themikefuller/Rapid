@@ -17,6 +17,7 @@ class Rapid {
         $cookies = [];
         $headers = [];
         $body = [];
+        $querystring = '';
         $query = [];
         $method = 'GET';    
         $resource = '/';
@@ -30,6 +31,7 @@ class Rapid {
             if (isset($argv[1])) {
                 $resource = explode('?',$argv[1]);
                 if (isset($resource[1])) {
+                    $querystring = $resource[1];
                     parse_str($resource[1],$query);
                     $requesturi = $resource[0] . '?' . $resource[1];
                     $resource = $resource[0];
@@ -76,6 +78,7 @@ class Rapid {
         if (isset($_SERVER['REQUEST_URI']) and !isset($argv[1])) {
             $resource = explode('?',$_SERVER['REQUEST_URI']);
             if (isset($resource[1])) {
+                $querystring = $resource[1];
                 parse_str($resource[1],$query);
                 $requesturi = $resource[0] . '?' . $resource[1];
                 $resource = $resource[0];
@@ -148,6 +151,7 @@ class Rapid {
           'method'=>$method,
           'resource'=>$resource,
           'uri'=>$uri,
+          'querystring'=>$querystring,
           'query'=>$query,
           'body'=>$body,
           'cookies'=>$cookies,
