@@ -228,7 +228,7 @@ class Rapid {
     }
 
     public function AllowCORS($allowed) {
-        $methods = 'GET, PUT, POST, DELETE, PATCH';
+        $methods = 'GET, PUT, POST, DELETE, OPTIONS, PATCH';
         if (!is_array($allowed)) {
             $temp = $allowed;
             unset($allowed);
