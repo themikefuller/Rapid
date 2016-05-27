@@ -58,4 +58,54 @@ Run the app
 
 ## COMMAND LINE INTERFACE
 
+Rapid can be run from the command line for testing and debugging purposes. The parameters are enter after the filename that is being executed. The command line interface switches are modeled after cURL.
+
+##CLI Examples
+
+GET request on /users
+
+    php app.php /users
+    
+POST request on /login with urlencoded body
+
+    php app.php /login -x POST -d "username=admin&password=secret"
+
+POST request on /login with JSON body
+
+    php app.php /login -x POST -d '{"username":"admin","password":"secret"}'
+
+GET request on /users with Authorization header
+
+    php app.php /users -h "Authorization: Bearer abcd1234"
+    
+GET request on /users with multiple query string parameters.
+
+    php app.php '/users?name=admin&profile=true'
+    
+Notice that the resource is placed within quotes. The & symbol in command line arguments has a habit of attempting to execute multiple commands, as is its nature. Putting quotes around the argument will provide the intended result.
+
+## Additional CLI information
+
+There should be one header defined per -h argument. Use multiple -h switches for multiple headers. Headers are entered as they would be in cURL. The key proceeds the value and the two are separated by a colon and space.
+
+    php app.php -h "Key: Value" /resource
+
+Data can be sent as an URLencoded string or as JSON. If the data is JSON, the entire JSON object should be enclosed within a pair of single quotes.
+
+    php app.php -d "key=value" /resource
+    php app.php -d '{"key":"value"}' /resource
+
+The resource can be placed at the beginning or the end of a command line request. If the resource contains multiple query parameters, the entire resource should be enclosed within quotes or double quotes.
+
+    php app.php /resource -h "Authorization: 1234"
+    php app.php -h "Authorization: 1234" /resource
+    php app.php "/resource?ok=yep&key=value" -h "Authorization: 1234"
+
+If the -x switch is not used, the method will default to GET.
+
+    php app.php /
+
+File uploads can not be tested from command line. 
+
+
 ## USING CORS
