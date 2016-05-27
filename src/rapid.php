@@ -26,35 +26,15 @@ class Rapid {
         $files = [];
 
         // Command Line Interface Arguments
-        global $argv;
-        if (isset($argv[0])) {  
-            if (isset($argv[1])) {
-                $resource = explode('?',$argv[1]);
-                if (isset($resource[1])) {
-                    $querystring = $resource[1];
-                    parse_str($resource[1],$query);
-                    $requesturi = $resource[0] . '?' . $resource[1];
-                    $resource = $resource[0];
-                } else {
-                    $resource = $resource[0];
-                }
-            }
-
-            if (isset($argv[2])) {
-                $method = strtoupper($argv[2]);
-            }
-
-            if (isset($argv[3])) {
-                if (strpos($argv[3],'{') === 0) {
-                    $body = json_decode($argv[3],true);
-                } else {
-                    parse_str($argv[3],$body);
-                }
-            }
-            if (isset($argv[4])) {
-                parse_str($argv[4],$headers);
-                $headers = array_change_key_case($headers,CASE_LOWER);
-            }
+        $cli = $this->CommandLine();
+        if ($cli) {
+            $headers = array_change_key_case($cli['headers'],CASE_LOWER);
+            $body = $cli['body'];
+            $method = $cli['method'];
+            $resource = $cli['resource'];
+            $query = $cli['query'];
+            $requesturi = $cli['requesturi'];
+            $querystring = $cli['querystring'];
         }
 
         // Web Server Specific Variables
@@ -265,6 +245,96 @@ class Rapid {
             }
         }
         return $response;
+    }
+
+    function CommandLine() {
+        global $argv;
+
+        $params = [];
+        $cli = false;
+        $dswitch = false;
+        $hswitch = false;
+        $xswitch = false;
+        $trip = false;
+        $resource = '/';
+        $headers = [];
+        $data = [];
+        $method = 'GET';
+        $query = [];
+        $querystring = '';
+        $requesturi = '';
+
+        if (isset($argv[1])) {
+            $params = $argv;
+            array_shift($params);
+    
+            foreach ($params as $param) {
+                if ($dswitch) {
+                    $dswitch = false;
+                    $data = $param;
+                    if ($data[0] == '{') {
+                        $data = json_decode($data,true);
+                    } else {
+                        parse_str($data,$data);
+                    }
+                    $trip = true;
+                }
+
+                if ($hswitch) {
+                    $hswitch = false;
+                    $hsplit = explode(': ',$param);
+                    $hkey = $hsplit[0];
+                    $hvalue = null;
+                    if (isset($hsplit[1])) {
+                        $hvalue = $hsplit[1];
+                    $headers[$hkey] = $hvalue;
+                    }
+                    $trip = true;
+                }
+
+                if ($xswitch) {
+                    $xswitch = false;
+                    $method = strtoupper($param);
+                    $trip = true;
+                }
+
+                if ($param[0] == '-') {
+                    if (isset($param[1]) and strtolower($param[1]) == 'd') {
+                        $dswitch = true;
+                    }
+                    if (isset($param[1]) and strtolower($param[1]) == 'h') {
+                        $hswitch = true;
+                    }
+                    if (isset($param[1]) and strtolower($param[1]) == 'x') {
+                        $xswitch = true;
+                    }
+                } else {
+                    if (!$trip) {
+                        $resource = '/' . ltrim($param,'/');
+                        $resource = explode('?',$argv[1]);
+                        if (isset($resource[1])) {
+                            $querystring = $resource[1];
+                            parse_str($resource[1],$query);
+                            $requesturi = $resource[0] . '?' . $resource[1];
+                            $resource = $resource[0];
+                        } else {
+                                $resource = $resource[0];
+                        }
+                    }
+                    $trip = false;
+                }
+            }
+
+        $cli['resource'] = $resource;
+        $cli['method'] = $method;
+        $cli['headers'] = $headers;
+        $cli['body'] = $data;
+        $cli['querystring'] = $querystring;
+        $cli['query'] = $query;
+        $cli['requesturi'] = $requesturi;      
+        }
+
+        return $cli;
     }
 
 }
