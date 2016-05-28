@@ -8,21 +8,20 @@ The documentation for this repository is a work in progress.
 ## BASIC EXAMPLE
 
     $host = 'example.com';
-    $baseurl = '/';
     $routes = [
       array('GET','/',function($app){
         echo 'Home Page';
       }),
     ];
     require_once '/path/to/rapid.php';
-    $app = new Rapid($host,$baseurl,$routes);
+    $app = new Rapid($host,$routes);
     $app->Run();
     
 ## SETUP
 
 Require rapid.php and create a new instance of the Rapid class.
 
-The $host, $baseurl, and $routes parameters used in the previous example are optional. Routes can be added after the $app object is created. Routes are required for the class to function properly. Without them, this robot has no purpose.
+The $host and $routes parameters used in the previous example are optional. Routes can be added after the $app object is created. Routes are required for the class to function properly. Without them, this robot has no purpose.
 
     require_once 'rapid.php';
     $app = new Rapid;

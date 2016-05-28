@@ -5,13 +5,13 @@ class Rapid {
     public $routes;
     public $request;
 
-    public function __construct($host = 'localhost',$baseurl='/',$routes=[]) {
-        $this->request = $this->TheRequest($host,$baseurl);
+    public function __construct($host = 'localhost',$routes=[]) {
+        $this->request = $this->TheRequest($host);
         $this->routes = [];
         $this->AddRoutes($routes);
     }
 
-    function TheRequest($host=null,$baseurl='/') {
+    function TheRequest($host='localhost') {
         // Blank, Null, Empty and defacto request values
         $protocol = 'http';
         $cookies = [];
@@ -19,116 +19,66 @@ class Rapid {
         $body = [];
         $querystring = '';
         $query = [];
-        $method = 'GET';    
+        $method = 'GET';
         $resource = '/';
         $uri = [];
         $requesturi = '';
         $files = [];
 
-        // Command Line Interface Arguments
-        $cli = $this->CommandLine();
-        if ($cli) {
-            $headers = array_change_key_case($cli['headers'],CASE_LOWER);
-            $body = $cli['body'];
-            $method = $cli['method'];
-            $resource = $cli['resource'];
-            $query = $cli['query'];
-            $requesturi = $cli['requesturi'];
-            $querystring = $cli['querystring'];
-        }
-
-        // Web Server Specific Variables
-        if (is_null($host) and isset($_SERVER['HTTP_HOST'])) {
-            $host = $_SERVER['HTTP_HOST'];
-        }
-
-        if (is_null($host)) {
-            $host = 'localhost';
+        global $argv;
+        if (isset($argv[0])) {
+            $cmd = $this->CommandLine($host);
         } else {
-            $host = rtrim($host,'/');
+            $cmd = $this->WebServer($host);
+        }
+ 
+        $host = $cmd['host'];
+        $headers = array_change_key_case($cmd['headers'],CASE_LOWER);
+        $body = $cmd['body'];
+        $method = $cmd['method'];
+        $requesturi = $cmd['requesturi'];
+        $protocol = $cmd['protocol'];
+
+        if (isset($cmd['files'])) {
+            $files = $cmd['files'];
         }
 
-        if ($baseurl == '/') {
-            $baseurl = '';
-        }
-
-        if (isset($_SERVER['HTTPS'])) {
-            $protocol = 'https';
-        }
-
-        if (isset($_SERVER['REQUEST_URI']) and !isset($argv[1])) {
-            $resource = explode('?',$_SERVER['REQUEST_URI']);
-            if (isset($resource[1])) {
-                $querystring = $resource[1];
-                parse_str($resource[1],$query);
-                $requesturi = $resource[0] . '?' . $resource[1];
-                $resource = $resource[0];
-            } else {
-                $resource = $resource[0];
+        $querystring = explode('?',$requesturi);
+        $resource = $querystring[0];
+        array_shift($querystring);
+        if (!empty($querystring)) {
+            $querystring = implode($querystring,'?');
+            parse_str($querystring,$query);
+            $querystring = '?' . $querystring;
+        } else {
+            $querystring = '';
             }
-        }
 
-        if (substr($resource, 0, strlen($baseurl)) == $baseurl) {
-            $resource = substr($resource, strlen($baseurl));
-        }
-              
+
+
         if ($resource != '/') {
             $resource = rtrim($resource,'/');
+            $resource = '/' . $resource;
             $uri = explode('/',$resource);
             array_shift($uri);
-        }
-
-        if (isset($_SERVER['REQUEST_URI'])) {
-            $requesturi = $_SERVER['REQUEST_URI'];
-        }
-        if (!isset($requesturi) or empty($requesturi)) {
-            $requesturi = $resource;
-        }
-
-        if (function_exists('getallheaders')) {
-            $headers = getallheaders();
-        }
-
-        if (isset($_COOKIE) and !empty($_COOKIE)) {
-            $cookies = $_COOKIE;
         }
 
         if (empty($cookies) and isset($headers['cookies'])) {
             parse_str($headers['cookies'],$cookies);
         }
 
-        if (isset($_GET) and !empty($_GET)) {
-            $query = $_GET;
+
+        if ($resource != '/') {
+            $resource = '/' . ltrim($resource,'/');
+            $uri = explode('/',ltrim($resource,'/'));
         }
 
-        if (isset($_POST) and !empty($_POST)) {
-            $body = $_POST;
-        }
-
-        if (isset($_FILES)) {
-            $files = $_FILES;
-        }  
-
-        $input = file_get_contents("php://input");
-        if (strpos($input,'{') === 0) {
-            $body = json_decode($input,true);
-        }
-
-        if (strpos($input,'{') !== 0 and $body == []) {
-            parse_str($input,$body);
-        }
-
-        if (isset($_SERVER['REQUEST_METHOD'])) {
-            $method = $_SERVER['REQUEST_METHOD'];
-        }
-
-        // Request Array
         $request = [
-          'hosturl'=>$protocol . '://' . $host . $baseurl,
-          'resourceurl'=>$protocol . '://' . $host . $baseurl . $resource,
-          'currenturl'=>$protocol . '://' . $host . $baseurl .  rtrim($requesturi,'/'),
+          'hosturl'=>$protocol . '://' . $host,
+          'resourceurl'=>$protocol . '://' . $host . $resource,
+          'currenturl'=>$protocol . '://' . $host .  rtrim($requesturi,'/'),
           'protocol'=>$protocol,
-          'host'=>$host . $baseurl,
+          'host'=>$host,
           'method'=>$method,
           'resource'=>$resource,
           'uri'=>$uri,
@@ -143,6 +93,7 @@ class Rapid {
         return $request;
     }
 
+  
     public function AddRoutes($routes) {
         if (isset($routes[0]) and !is_array($routes[0])) {
             $routes = [$routes];
@@ -178,6 +129,7 @@ class Rapid {
                 }
                 $resources = explode('/',$resource);
                 $test = explode('/',$test);
+
                 if (sizeof($resources) == sizeof($test)) {
                     $count = 0;
                     while ($count <= (sizeof($resources) - 1 )) {
@@ -204,6 +156,7 @@ class Rapid {
         }
         $response['action'] = $action;
         $response['params'] = $params;
+
         return $response;
     }
 
@@ -247,23 +200,76 @@ class Rapid {
         return $response;
     }
 
-    function CommandLine() {
-        global $argv;
+  public function WebServer($host) {
 
-        $params = [];
-        $cli = false;
+        if ($host == 'localhost') {
+            $host = $_SERVER['HTTP_HOST'];
+        }
+
+
+        if (isset($_SERVER['HTTPS'])) {
+            $protocol = 'https';
+        } else {
+            $protocol = 'http';
+        }
+
+        $requesturi = $_SERVER['REQUEST_URI'];
+
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+        }
+
+        if (isset($_COOKIE) and !empty($_COOKIE)) {
+            $cookies = $_COOKIE;
+        }
+
+        if (isset($_POST) and !empty($_POST)) {
+            $body = $_POST;
+        }
+
+        if (isset($_FILES)) {
+            $files = $_FILES;
+        }
+
+        $input = file_get_contents("php://input");
+        if (strpos($input,'{') === 0) {
+            $body = json_decode($input,true);
+        }
+
+        if (strpos($input,'{') !== 0 and $body == []) {
+            parse_str($input,$body);
+        }
+
+        $method = $_SERVER['REQUEST_METHOD'];
+
+        $web['host'] = $host;
+        $web['resource'] = $resource;
+        $web['method'] = $method;
+        $web['headers'] = $headers;
+        $web['body'] = $body;
+        $web['requesturi'] = $requesturi;
+        $web['protocol'] = 'http';
+        $web['cookies'] = $cookies;
+        $web['files'] = $files;
+
+        return $web;
+
+    }
+
+
+
+    private function CommandLine($host) {
         $dswitch = false;
         $hswitch = false;
         $xswitch = false;
         $trip = false;
-        $resource = '/';
         $headers = [];
         $data = [];
         $method = 'GET';
-        $query = [];
-        $querystring = '';
-        $requesturi = '';
+        $requesturi = '/';
 
+        $params = [];
+        global $argv;
         if (isset($argv[1])) {
             $params = $argv;
             array_shift($params);
@@ -310,31 +316,21 @@ class Rapid {
                     }
                 } else {
                     if (!$trip) {
-                        $resource = '/' . ltrim($param,'/');
-                        $resource = explode('?',$argv[1]);
-                        if (isset($resource[1])) {
-                            $querystring = $resource[1];
-                            parse_str($resource[1],$query);
-                            $requesturi = $resource[0] . '?' . $resource[1];
-                            $resource = $resource[0];
-                        } else {
-                                $resource = $resource[0];
-                        }
+                        $requesturi = $param;
                     }
                     $trip = false;
                 }
             }
+        }
 
-        $cli['resource'] = $resource;
+        $cli['host'] = $host;
         $cli['method'] = $method;
         $cli['headers'] = $headers;
         $cli['body'] = $data;
-        $cli['querystring'] = $querystring;
-        $cli['query'] = $query;
-        $cli['requesturi'] = $requesturi;      
-        }
-
+        $cli['requesturi'] = $requesturi;
+        $cli['protocol'] = 'http';
         return $cli;
     }
 
 }
+
