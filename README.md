@@ -1,9 +1,9 @@
 # Rapid
 Rapid is a PHP web framework for HTTP request and response routing.
 
-Rapid provides a puwerfully simple interface for routing methods and requests to resource controllers. A command line interface is included to test and perform requests without the use of a web server.
+Rapid provides a powerfully simple interface for routing methods and requests to resource controllers. A command line interface is included to test and perform requests without the use of a web server.
 
-The documentation for this repository is a work in progress.
+Please take note that the current version differs heavily from earlier commits. Branches will be established to separate out more official version releases soon. The documentation for this repository is **still** a work in progress.
 
 ## BASIC EXAMPLE
 
@@ -47,13 +47,79 @@ Run the app
 
 ## THE $app OBJECT
 
+The $app object the $routes property, the request property and a number of methods for manipulating those properties.
+
+The two main methods are AddRoutes() and Run().
+
+### AddRoutes($routes)
+
+This method accepts an array containing a single route, or an array containing multiple route arrays.
+
+Single Route
+
+    // Add a single route
+    $home = array('GET','/',function($app) {
+        echo 'Home Page';
+    });
+    $app->AddRoutes($home);
+
+Multiple Routes
+
+    // Add multiple routes at once
+    $routes = [
+            
+        ['GET','/',function($app){
+            echo 'Home Page';
+        }],
+        
+        ['GET','/users',function($app){
+            echo 'List of Users';
+        }],
+        
+        ['GET','/users/:username',function($app){
+            echo "Profile for " . $app->request['params']['username'];
+        }],    
+
+    ];
+    $app->AddRoutes($routes);
+
+Routes can be added after the $app object has been created. See the **ROUTING** section for advanced routing techniques.
+
+### $app->Run();
+
+The $app->Run() method routes the request to the appropriate route and executes it. Run thisa fter all routes and middleware have been added to the object.
+
+    $app->Run();
+
+By default this method does not return any value. The route can be the controller or the jumping off point to a controller or view. However, if the route ends with a return the value can be expressed with the $app->Run() method.
+
+This is perfectly acceptable.
+
+    $app = new Rapid;
+    $routes = [
+        'GET','/', function($app) {
+            return 'Home Page';
+        }
+    ];
+    $app->AddRoutes($routes);
+    $output = $app->Run();
+    echo $output;
+    
 ## THE REQUEST
+
+Coming Soon.
 
 ## ROUTING
 
+Coming Soon.
+
 ## WILDCARD ROUTES
 
+Coming Soon.
+
 ## THE RESPONSE
+
+Coming Soon.
 
 ## COMMAND LINE INTERFACE
 
@@ -104,7 +170,29 @@ If the -x switch is not used, the method will default to GET.
 
     php app.php /
 
-File uploads can not be tested from command line. 
+File uploads can not be tested from command line.
 
 
 ## USING CORS
+
+Cross Origin Resource Sharing can be enabled for specific domains. Here is an array containing a list of acceptable origins. 
+
+    $allowed = [
+        'https://www.example.com',
+        'https://example.com',
+        'https://api.example.com'
+    ];
+    
+Pass the array into the AllowCORS() method.
+
+    $app->AllowCORS($allowed); 
+
+During an Ajax request, the user's web browser will typical require a response from an OPTIONS method on the destination server and check that the originating site (origin) is allowed to make the request. This route will answer all OPTIONS requests with a "NO CONTENT" response and the appropriate origin in the header.
+
+    $app->addRoutes(['OPTIONS','*',function($app){
+    http_response_code('204');
+    }]);
+    
+## ADDITIONAL INFORMATION
+
+Currently, file uploads in Rapid are only fully supported by the HTTP POST method.
