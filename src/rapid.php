@@ -11,7 +11,7 @@ class Rapid {
         $this->AddRoutes($routes);
     }
 
-    function TheRequest($host='localhost') {
+    private function TheRequest($host='localhost') {
         // Blank, Null, Empty and defacto request values
         $protocol = 'http';
         $cookies = [];
@@ -27,7 +27,7 @@ class Rapid {
 
         global $argv;
         if (isset($argv[0])) {
-            $cmd = $this->CommandLine($host);
+            $cmd = $this->CommandLine($host,$argv);
         } else {
             $cmd = $this->WebServer($host);
         }
@@ -114,7 +114,7 @@ class Rapid {
         return $this->routes;
     }
 
-    public function Action($method,$resource) {
+    private function Action($method,$resource) {
         $action = null;
         $params = [];
         $routes = $this->routes;
@@ -200,7 +200,7 @@ class Rapid {
         return $response;
     }
 
-  public function WebServer($host) {
+  private function WebServer($host) {
 
         if ($host == 'localhost') {
             $host = $_SERVER['HTTP_HOST'];
@@ -258,7 +258,7 @@ class Rapid {
 
 
 
-    private function CommandLine($host) {
+    private function CommandLine($host,$argv) {
         $dswitch = false;
         $hswitch = false;
         $xswitch = false;
@@ -267,9 +267,8 @@ class Rapid {
         $data = [];
         $method = 'GET';
         $requesturi = '/';
-
         $params = [];
-        global $argv;
+
         if (isset($argv[1])) {
             $params = $argv;
             array_shift($params);
