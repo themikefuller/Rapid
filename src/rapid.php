@@ -209,11 +209,13 @@ class Rapid {
     public function SendJSON($object) {
         header('Content-Type: application/json');
         echo json_encode($object, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        die();
     }
 
     public function Send($object) {
         header('Content-Type: text/html');
         echo $object;
+        die();
     }
 
   private function WebServer($host) {
