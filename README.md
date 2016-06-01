@@ -10,7 +10,7 @@ Please take note that the current version differs heavily from earlier commits. 
     $host = 'example.com';
     $routes = [
       array('GET','/',function($app){
-        echo 'Home Page';
+        $app->Send("Home Page");
       }),
     ];
     require_once '/path/to/rapid.php';
@@ -30,13 +30,13 @@ Add Routes to the $app object
 
     $routes = [
         array('GET','/',function($app) {
-            echo 'Home Page';
+          $app->Send("Home Page");
         }),
         array('GET','/users',function($app) {
-          echo 'User List';
+          $app->Send("List of Users");
         }),
         array('GET','/users/:username',function($app) {
-          echo 'Profile for ' . $app->request['params']['username'];
+          $app->Send('Profile for ' . $app->request['params']['username']);
         }),
     ];
     $app->AddRoutes($routes);
@@ -59,7 +59,7 @@ Single Route
 
     // Add a single route
     $home = array('GET','/',function($app) {
-        echo 'Home Page';
+        $app->Send("Home Page");
     });
     $app->AddRoutes($home);
 
@@ -69,15 +69,15 @@ Multiple Routes
     $routes = [
             
         ['GET','/',function($app){
-            echo 'Home Page';
+            $app->Send("Home Page");
         }],
         
         ['GET','/users',function($app){
-            echo 'List of Users';
+            $app->Send("List of Users");
         }],
         
         ['GET','/users/:username',function($app){
-            echo "Profile for " . $app->request['params']['username'];
+            Send("Profile for " . $app->request['params']['username']);
         }],    
 
     ];
@@ -91,7 +91,17 @@ The $app->Run() method routes the request to the appropriate route and executes 
 
     $app->Run();
 
-By default this method does not return any value. The route can be the controller or the jumping off point to a controller or view. However, if the route ends with a return the value can be expressed with the $app->Run() method.
+## Output
+
+By default routes do not return any value. The $app->Send($value) method will send a text/html content response header and echo out the string value passed into it. The script will end after this function is called.
+
+    $app->Send("Text");
+    
+ The $app->SendJSON($value) method will send an application/json content response header and echo out an array as a JSON document. The script will end after this function is called.
+
+    $app->SendJSON($array);
+    
+The route can be the controller or the jumping off point to a controller or view. if the route ends with a return the value can be expressed with the $app->Run() method.
 
 This is perfectly acceptable.
 
