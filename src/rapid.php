@@ -54,8 +54,6 @@ class Rapid {
             $querystring = '';
             }
 
-
-
         if ($resource != '/') {
             $resource = rtrim($resource,'/');
             $resource = '/' . $resource;
@@ -98,15 +96,23 @@ class Rapid {
         if (isset($routes[0]) and !is_array($routes[0])) {
             $routes = [$routes];
         }
+        $slash = false;
         foreach ($routes as $route) {
             $new['method']   = strtoupper($route[0]);
             $new['resource'] = $route[1];
             $new['action']   = $route[2];
-            if ($new['resource'] == '*' and $new['method'] == '*') {
+            if ($new['resource'] == '*' and $new['method'] == '*' and $new['resource'] != '/') {
                 $this->routes[] = $new;
             } else {
-                array_unshift($this->routes,$new);
+                if ($new['resource'] != '/') {
+                    array_unshift($this->routes,$new);
+                } else {
+                    $slash = $new;
+                }
             }
+        }
+        if ($slash) {
+            array_unshift($this->routes,$slash);
         }
     }
 
@@ -198,6 +204,16 @@ class Rapid {
             }
         }
         return $response;
+    }
+
+    public function SendJSON($object) {
+        header('Content-Type: application/json');
+        echo json_encode($object, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    public function Send($object) {
+        header('Content-Type: text/html');
+        echo $object;
     }
 
   private function WebServer($host) {
@@ -332,4 +348,3 @@ class Rapid {
     }
 
 }
-

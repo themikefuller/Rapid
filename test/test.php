@@ -10,31 +10,36 @@ require_once '../src/rapid.php';
 
 // Assign Routes
 $routes = [
-
-
-  // GET on /users/:username sets $app->request['params']['username'] to :username
-  array('GET','/users/:username',function($app){
-    http_response_code('200');
-    $message = $app->request;
-    $json = json_encode([$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    echo $json;
+ 
+  // GET on / returns an HTML text response. By default the response status code is 200.
+  array('GET','/',function($app) {
+    $app->Send('home page');
   }),
 
-  // POST on ANY resource returns the body of the request
+  // GET on a resource returns the resource as a parameter within a JSON document. 
+  array('GET','/:resource',function($app){
+    $message = $app->request['params'];
+    $app->SendJSON($message);
+  }),
+
+  // GET on a subresource returns the resource and subresource as paramaters within a JSON document.
+  array('GET','/:resource/:subresource',function($app){
+    $message = $app->request['params'];
+    $app->SendJSON($message);
+  }),
+
+  // POST on ANY resource returns the body of the request within a JSON document and a 201 status code.
   array('POST','*',function($app){
-    http_response_code('200');
+    http_response_code('201');
     $message = $app->request['body'];
-    $json = json_encode([$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    echo $json;
+    $app->SendJSON($message);
   }),
 
-
-  // ANY METHOD on ANY OTHER resource returns the full request
+  // ANY METHOD on ANY OTHER resource returns the full request as a JSON document and a 404 staus code.
   array('*','*',function($app){
-    http_response_code('200');
+    http_response_code('404');
     $message = $app->request;
-    $json = json_encode([$message], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    echo $json;
+    $app->SendJSON($message);
   }),
 
 ];
