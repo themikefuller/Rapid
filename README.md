@@ -199,9 +199,12 @@ Pass the array into the AllowCORS() method.
 
 During an Ajax request, the user's web browser will typical require a response from an OPTIONS method on the destination server and check that the originating site (origin) is allowed to make the request. This route will answer all OPTIONS requests with a "NO CONTENT" response and the appropriate origin in the header.
 
-    $app->addRoutes(['OPTIONS','*',function($app){
-    http_response_code('204');
-    }]);
+    $routes = [
+        array('OPTIONS','*',function($app){
+            http_response_code('204');
+        }),
+    ];
+    $app->AddRoutes($routes);
     
 ## ADDITIONAL INFORMATION
 
