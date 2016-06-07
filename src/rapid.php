@@ -38,6 +38,7 @@ class Rapid {
         $method = $cmd['method'];
         $requesturi = $cmd['requesturi'];
         $protocol = $cmd['protocol'];
+        $cookies = $cmd['cookies'];
 
         if (isset($cmd['files'])) {
             $files = $cmd['files'];
@@ -64,7 +65,6 @@ class Rapid {
         if (empty($cookies) and isset($headers['cookies'])) {
             parse_str($headers['cookies'],$cookies);
         }
-
 
         if ($resource != '/') {
             $resource = '/' . ltrim($resource,'/');
@@ -346,6 +346,7 @@ class Rapid {
         $cli['body'] = $data;
         $cli['requesturi'] = $requesturi;
         $cli['protocol'] = 'http';
+        $cli['cookies'] = [];
         return $cli;
     }
 
