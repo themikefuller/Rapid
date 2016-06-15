@@ -37,7 +37,7 @@ $routes = [
 
   // ANY METHOD on ANY OTHER resource returns the full request as a JSON document and a 404 staus code.
   array('*','*',function($app){
-    http_response_code('404');
+    http_response_code('405');
     $message = $app->request;
     $app->SendJSON($message);
   }),

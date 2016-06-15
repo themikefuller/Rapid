@@ -101,7 +101,7 @@ class Rapid {
             $new['method']   = strtoupper($route[0]);
             $new['resource'] = $route[1];
             $new['action']   = $route[2];
-            if ($new['resource'] == '*' and $new['method'] == '*' and $new['resource'] != '/') {
+            if (($new['resource'] == '*' or $new['method'] == '*') and $new['resource'] != '/') {
                 $this->routes[] = $new;
             } else {
                 if ($new['resource'] != '/') {
@@ -222,7 +222,6 @@ class Rapid {
             $host = $_SERVER['HTTP_HOST'];
         }
 
-
         if (isset($_SERVER['HTTPS'])) {
             $protocol = 'https';
         } else {
@@ -264,7 +263,7 @@ class Rapid {
         $web['headers'] = $headers;
         $web['body'] = $body;
         $web['requesturi'] = $requesturi;
-        $web['protocol'] = 'http';
+        $web['protocol'] = $protocol;
         $web['cookies'] = $cookies;
         $web['files'] = $files;
 
