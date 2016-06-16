@@ -292,7 +292,7 @@ class Rapid {
                 if ($dswitch) {
                     $dswitch = false;
                     $data = $param;
-                    if ($data[0] == '{') {
+                    if (isset($data[0]) and $data[0] == '{') {
                         $data = json_decode($data,true);
                     } else {
                         parse_str($data,$data);
@@ -318,7 +318,7 @@ class Rapid {
                     $trip = true;
                 }
 
-                if ($param[0] == '-') {
+                if (isset($param[0]) and $param[0] == '-') {
                     if (isset($param[1]) and strtolower($param[1]) == 'd') {
                         $dswitch = true;
                     }
