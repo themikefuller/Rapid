@@ -103,7 +103,7 @@ By default routes do not return any value. The $app->Send($value) method will se
     
 The route can be the controller or the jumping off point to a controller or view. if the route ends with a return the value can be expressed with the $app->Run() method.
 
-This is perfectly acceptable.
+This WAS* perfectly acceptable.
 
     $app = new Rapid;
     $routes = [
@@ -114,6 +114,8 @@ This is perfectly acceptable.
     $app->AddRoutes($routes);
     $output = $app->Run();
     echo $output;
+
+*HOWEVER, As of now, to properly support HEAD requests, SendJSON() and Send() now support intercepting HEAD requests and returning no response body. If you choose to use a different method to produce output, you will have to duplicate your routes to support HEAD requests.
     
 ## THE REQUEST
 

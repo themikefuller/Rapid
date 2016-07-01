@@ -24,6 +24,7 @@ class Rapid {
         $uri = [];
         $requesturi = '';
         $files = [];
+        $head = false;
 
         global $argv;
         if (isset($argv[0])) {
@@ -39,6 +40,11 @@ class Rapid {
         $requesturi = $cmd['requesturi'];
         $protocol = $cmd['protocol'];
         $cookies = $cmd['cookies'];
+
+        if ($method == 'HEAD' or $method == 'head') {
+            $method = 'GET';
+            $head = true;
+        }
 
         if (isset($cmd['files'])) {
             $files = $cmd['files'];
@@ -87,6 +93,7 @@ class Rapid {
           'cookies'=>array_change_key_case($cookies,CASE_LOWER),
           'files'=>$files,
           'headers'=>array_change_key_case($headers,CASE_LOWER),
+          'head'=>$head,
         ];
         return $request;
     }
@@ -208,12 +215,16 @@ class Rapid {
 
     public function SendJSON($object) {
         header('Content-Type: application/json');
-        echo json_encode($object, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if (!$this->request['head']) {
+            echo json_encode($object, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        }
     }
 
     public function Send($object) {
         header('Content-Type: text/html');
-        echo $object;
+        if (!$this->request['head']) {
+            echo $object;
+        }
     }
 
   private function WebServer($host) {
