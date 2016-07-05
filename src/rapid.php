@@ -233,6 +233,7 @@ class Rapid {
 
   private function WebServer($host) {
 
+
         if ($host == 'localhost') {
             $host = $_SERVER['HTTP_HOST'];
         }
@@ -249,10 +250,12 @@ class Rapid {
             $headers = getallheaders();
         }
 
+        $cookies = [];
         if (isset($_COOKIE) and !empty($_COOKIE)) {
             $cookies = $_COOKIE;
         }
 
+        $body = [];
         if (isset($_POST) and !empty($_POST)) {
             $body = $_POST;
         }
@@ -273,7 +276,6 @@ class Rapid {
         $method = $_SERVER['REQUEST_METHOD'];
 
         $web['host'] = $host;
-        $web['resource'] = $resource;
         $web['method'] = $method;
         $web['headers'] = $headers;
         $web['body'] = $body;
